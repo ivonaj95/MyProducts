@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myproducts.entity.Product
 import com.example.myproducts.R
 import com.example.myproducts.addImageIntoView
+import javax.inject.Inject
 
-class ProductsAdapter :
+class ProductsAdapter @Inject constructor() :
     RecyclerView.Adapter<ProductItemViewHolder>() {
 
     private lateinit var onClickListener : ProductItemClickListener

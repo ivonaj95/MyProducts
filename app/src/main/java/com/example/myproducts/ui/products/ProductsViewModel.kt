@@ -4,14 +4,17 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.example.myproducts.*
 import com.example.myproducts.api.ApiObject
+import com.example.myproducts.api.Repository
 import com.example.myproducts.database.ProductDatabase
 import com.example.myproducts.database.ProductDatabaseDao
 import com.example.myproducts.entity.Product
 import com.example.myproducts.entity.StateData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class ProductsViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ProductsViewModel @Inject constructor(application: Application, private val repository: Repository) : AndroidViewModel(application) {
 
     private val _products = MutableLiveData<StateData<List<Product>>>()
     val products: LiveData<StateData<List<Product>>>
