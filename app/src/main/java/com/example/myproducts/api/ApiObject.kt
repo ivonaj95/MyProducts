@@ -27,6 +27,6 @@ object ApiObject {
 
     @Singleton
     @Provides
-    fun providesRepository(apiService: ApiService) = ProductsRepository(apiService)
+    fun provideRepository(apiService: ApiService) = ProductsRepository(apiService)
 
 }

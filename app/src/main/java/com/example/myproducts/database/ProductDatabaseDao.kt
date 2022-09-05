@@ -21,6 +21,9 @@ interface ProductDatabaseDao {
     @Query("SELECT * FROM $DATABASE_NAME WHERE id = :key")
     suspend fun get(key: Int): Product?
 
+    @Query("SELECT * FROM $DATABASE_NAME")
+    suspend fun getAll() : List<Product>?
+
     @Delete
     suspend fun delete(product: Product)
 

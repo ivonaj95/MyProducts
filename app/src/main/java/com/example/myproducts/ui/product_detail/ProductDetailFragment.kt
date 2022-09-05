@@ -12,8 +12,10 @@ import com.example.myproducts.BUNDLE_ID
 import com.example.myproducts.entity.Product
 import com.example.myproducts.R
 import com.example.myproducts.addImageIntoView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
+@AndroidEntryPoint
 class ProductDetailFragment : DialogFragment() {
 
     companion object {
