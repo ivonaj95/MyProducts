@@ -12,7 +12,9 @@ import com.example.myproducts.R
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myproducts.BUNDLE_ID
 import com.example.myproducts.ui.product_detail.ProductDetailFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProductsFragment : Fragment() {
 
     companion object {

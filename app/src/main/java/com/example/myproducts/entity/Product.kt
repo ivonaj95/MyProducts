@@ -9,7 +9,6 @@ import com.example.myproducts.DATABASE_NAME
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
-//TODO DEPENDENCY INJECTION IVONA
 @Parcelize
 @Entity(tableName = DATABASE_NAME)
 data class Product(

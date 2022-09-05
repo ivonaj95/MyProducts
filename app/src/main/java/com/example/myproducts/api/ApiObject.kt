@@ -1,5 +1,6 @@
 package com.example.myproducts.api
 
+import com.example.myproducts.repositories.ProductsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +24,9 @@ object ApiObject {
     @Singleton
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+
+    @Singleton
+    @Provides
+    fun providesRepository(apiService: ApiService) = ProductsRepository(apiService)
 
 }
