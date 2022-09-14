@@ -65,13 +65,14 @@ class ProductsRepository(private val apiService: ApiService) : CacheRepository()
             productsResponse = getProductsApi()
         } catch (e: Exception) {
             // Call is not executed....
-            return StateData(null, CALL_NOT_EXECUTED, e.message)
+            return StateData(StateData.Status.ERROR, null, CALL_NOT_EXECUTED, e.message)
         }
 
         if (productsResponse.isSuccessful) {
             productsResponse.body()?.let { copyProducts ->
 
                 return StateData(
+                    StateData.Status.SUCCESS,
                     copyProducts.products,
                     null,
                     productsResponse.message()
@@ -79,10 +80,20 @@ class ProductsRepository(private val apiService: ApiService) : CacheRepository()
 
             } ?: run {
                 // Empty data --- error
-                return StateData(null, EMPTY_DATA, productsResponse.message())
+                return StateData(
+                    StateData.Status.ERROR,
+                    null,
+                    EMPTY_DATA,
+                    productsResponse.message()
+                )
             }
         } else {
-            return StateData(null, productsResponse.code(), productsResponse.message())
+            return StateData(
+                StateData.Status.ERROR,
+                null,
+                productsResponse.code(),
+                productsResponse.message()
+            )
         }
 
     }
@@ -94,13 +105,14 @@ class ProductsRepository(private val apiService: ApiService) : CacheRepository()
             productResponse = getProductApi(id)
         } catch (e: Exception) {
             // Call is not executed....
-            return StateData(null, CALL_NOT_EXECUTED, e.message)
+            return StateData(StateData.Status.ERROR, null, CALL_NOT_EXECUTED, e.message)
         }
 
         if (productResponse.isSuccessful) {
             productResponse.body()?.let { copyProduct ->
 
                 return StateData(
+                    StateData.Status.SUCCESS,
                     copyProduct,
                     null,
                     productResponse.message()
@@ -108,10 +120,20 @@ class ProductsRepository(private val apiService: ApiService) : CacheRepository()
 
             } ?: run {
                 // Empty data --- error
-                return StateData(null, EMPTY_DATA, productResponse.message())
+                return StateData(
+                    StateData.Status.ERROR,
+                    null,
+                    EMPTY_DATA,
+                    productResponse.message()
+                )
             }
         } else {
-            return StateData(null, productResponse.code(), productResponse.message())
+            return StateData(
+                StateData.Status.ERROR,
+                null,
+                productResponse.code(),
+                productResponse.message()
+            )
         }
 
     }

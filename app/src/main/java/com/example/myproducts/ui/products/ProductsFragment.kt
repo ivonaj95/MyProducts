@@ -11,6 +11,8 @@ import androidx.lifecycle.Observer
 import com.example.myproducts.R
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myproducts.BUNDLE_ID
+import com.example.myproducts.MainActivity
+import com.example.myproducts.entity.StateData
 import com.example.myproducts.ui.product_detail.ProductDetailFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,11 +47,19 @@ class ProductsFragment : Fragment() {
         }
 
         viewModel.products.observe(viewLifecycleOwner, Observer { newProducts ->
-            newProducts.error_code?.let {
-                messageView.text = "$it : ${newProducts.message}"
-                messageView.visibility = View.VISIBLE
-            } ?: run {
-                adapter.products = newProducts.data!!
+            when (newProducts.status) {
+                StateData.Status.LOADING -> {
+                    (activity as MainActivity).showLoading()
+                }
+                StateData.Status.SUCCESS -> {
+                    (activity as MainActivity).hideLoading()
+                    adapter.products = newProducts.data!!
+                }
+                StateData.Status.ERROR -> {
+                    (activity as MainActivity).hideLoading()
+                    messageView.visibility = View.VISIBLE
+                    messageView.text = "${newProducts.error_code} : ${newProducts.message}"
+                }
             }
 
         })

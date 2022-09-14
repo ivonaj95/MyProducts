@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/product_detail"
@@ -17,46 +16,54 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:padding="10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <ProgressBar
+                android:id="@+id/loadingBarDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true" />
 
             <ImageView
                 android:id="@+id/main_product_image"
                 android:layout_width="wrap_content"
-                android:adjustViewBounds="true"
                 android:layout_height="300dp"
+                android:adjustViewBounds="true"
                 android:background="@color/black"
                 android:padding="10dp"
+                android:visibility="gone"
                 tools:src="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/product_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="20dp"
                 android:paddingTop="10dp"
-                tools:text="Product name"
+                android:paddingBottom="20dp"
                 android:textSize="30sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Product name" />
 
             <TextView
                 android:id="@+id/product_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="20dp"
-                tools:text="Something about product.... "
-                android:textSize="20sp"
                 android:textAlignment="center"
-                android:textStyle="italic" />
+                android:textSize="20sp"
+                android:textStyle="italic"
+                tools:text="Something about product.... " />
 
             <TextView
                 android:id="@+id/product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="20dp"
-                tools:text="50$"
                 android:textSize="50sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="50$" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </RelativeLayout>

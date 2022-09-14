@@ -12,7 +12,7 @@ open class CacheRepository {
         val cachedData = readFromLocalDatabase()
         if (cachedData != null) {
             Log.d("IVONA", "return cached data $cachedData")
-            return StateData(cachedData, null, null)
+            return StateData(StateData.Status.SUCCESS, cachedData, null, null)
         }
         Log.d("IVONA", "fetch and cache data")
         val fetchedData = fetch()

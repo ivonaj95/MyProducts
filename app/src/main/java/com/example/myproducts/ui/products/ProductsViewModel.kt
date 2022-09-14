@@ -24,6 +24,7 @@ class ProductsViewModel @Inject constructor(
     private var databaseDao: ProductDatabaseDao
 
     init {
+        _products.value = StateData(StateData.Status.LOADING, null, null, null)
         databaseDao = ProductDatabase.getInstance(application).productDatabaseDao
         getProducts()
     }
