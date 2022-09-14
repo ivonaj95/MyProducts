@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.myproducts.database.ProductDatabase
 import com.example.myproducts.database.ProductDatabaseDao
+import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.Product
 import com.example.myproducts.entity.StateData
 import com.example.myproducts.repositories.ProductsRepository
@@ -20,8 +21,8 @@ class ProductDetailViewModel @Inject constructor(
     private val productsRepository: ProductsRepository
 ) : AndroidViewModel(application) {
 
-    private val _product = MutableLiveData<StateData<Product>>()
-    val product: LiveData<StateData<Product>>
+    private val _product = MutableLiveData<StateData<ProductDomain>>()
+    val product: LiveData<StateData<ProductDomain>>
         get() = _product
 
     private var databaseDao: ProductDatabaseDao

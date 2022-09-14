@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.example.myproducts.repositories.ProductsRepository
 import com.example.myproducts.database.ProductDatabase
 import com.example.myproducts.database.ProductDatabaseDao
+import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.Product
 import com.example.myproducts.entity.StateData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +18,8 @@ class ProductsViewModel @Inject constructor(
     private val productsRepository: ProductsRepository
 ) : AndroidViewModel(application) {
 
-    private val _products = MutableLiveData<StateData<List<Product>>>()
-    val products: LiveData<StateData<List<Product>>>
+    private val _products = MutableLiveData<StateData<List<ProductDomain>>>()
+    val products: LiveData<StateData<List<ProductDomain>>>
         get() = _products
 
     private var databaseDao: ProductDatabaseDao

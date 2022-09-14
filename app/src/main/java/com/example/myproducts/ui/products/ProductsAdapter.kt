@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myproducts.entity.Product
 import com.example.myproducts.R
 import com.example.myproducts.addImageIntoView
+import com.example.myproducts.domain.ProductDomain
 import javax.inject.Inject
 
 class ProductsAdapter @Inject constructor() :
@@ -16,7 +17,7 @@ class ProductsAdapter @Inject constructor() :
 
     private lateinit var onClickListener : ProductItemClickListener
 
-    var products = listOf<Product>()
+    var products = listOf<ProductDomain>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -47,7 +48,7 @@ class ProductsAdapter @Inject constructor() :
         return products.size
     }
 
-    fun setOnClickListener(clickListener: (product: Product) -> Unit) {
+    fun setOnClickListener(clickListener: (product: ProductDomain) -> Unit) {
         onClickListener = ProductItemClickListener(clickListener)
     }
 
@@ -58,6 +59,6 @@ class ProductItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     val productTitle: TextView = itemView.findViewById(R.id.product_title)
 }
 
-class ProductItemClickListener(val clickListener: (product: Product) -> Unit) {
-    fun onClick(product: Product) = clickListener(product)
+class ProductItemClickListener(val clickListener: (product: ProductDomain) -> Unit) {
+    fun onClick(product: ProductDomain) = clickListener(product)
 }

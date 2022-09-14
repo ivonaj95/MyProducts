@@ -13,6 +13,7 @@ import com.example.myproducts.BUNDLE_ID
 import com.example.myproducts.entity.Product
 import com.example.myproducts.R
 import com.example.myproducts.addImageIntoView
+import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.StateData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
@@ -68,7 +69,7 @@ class ProductDetailFragment : DialogFragment() {
         return dialog
     }
 
-    private fun refreshUI(product: Product) {
+    private fun refreshUI(product: ProductDomain) {
         product.thumbnail?.let {
             addImageIntoView(imageView, it)
             imageView.visibility = View.VISIBLE
