@@ -6,7 +6,6 @@ import com.example.myproducts.repositories.ProductsRepository
 import com.example.myproducts.database.ProductDatabase
 import com.example.myproducts.database.ProductDatabaseDao
 import com.example.myproducts.domain.ProductDomain
-import com.example.myproducts.entity.Product
 import com.example.myproducts.entity.StateData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

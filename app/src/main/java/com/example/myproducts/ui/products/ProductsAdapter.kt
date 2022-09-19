@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myproducts.entity.Product
 import com.example.myproducts.R
 import com.example.myproducts.addImageIntoView
 import com.example.myproducts.domain.ProductDomain
@@ -15,7 +14,9 @@ import javax.inject.Inject
 class ProductsAdapter @Inject constructor() :
     RecyclerView.Adapter<ProductItemViewHolder>() {
 
-    private lateinit var onClickListener : ProductItemClickListener
+    private lateinit var onClickListener: ProductItemClickListener
+    private val INVALID_POSITION = -1
+    private var lastClickedPos = INVALID_POSITION
 
     var products = listOf<ProductDomain>()
         set(value) {
@@ -28,6 +29,7 @@ class ProductsAdapter @Inject constructor() :
         val viewHolder = ProductItemViewHolder(view)
 
         viewHolder.itemView.setOnClickListener {
+            lastClickedPos = viewHolder.bindingAdapterPosition
             onClickListener.onClick(products[viewHolder.bindingAdapterPosition])
         }
         viewHolder.itemView.setOnFocusChangeListener { _, hasFocus ->
@@ -38,6 +40,10 @@ class ProductsAdapter @Inject constructor() :
     }
 
     override fun onBindViewHolder(holder: ProductItemViewHolder, position: Int) {
+        if (position == lastClickedPos) {
+            holder.itemView.requestFocus()
+            lastClickedPos = INVALID_POSITION
+        }
 
         val item = products[position]
         holder.productTitle.text = item.title

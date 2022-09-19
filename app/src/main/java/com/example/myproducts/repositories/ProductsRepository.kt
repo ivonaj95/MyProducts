@@ -68,10 +68,10 @@ class ProductsRepository(private val apiService: ApiService) : CacheRepository()
 
     private suspend fun readAllProductsFromLocalDatabase(productDatabaseDao: ProductDatabaseDao): List<ProductDomain>? {
         productDatabaseDao.getAll()?.let {
-            if (it.isEmpty()) {
-                return null
+            return if (it.isEmpty()) {
+                null
             } else {
-                return productMapper.fromEntityList(it)
+                productMapper.fromEntityList(it)
             }
         } ?: run {
             return null
