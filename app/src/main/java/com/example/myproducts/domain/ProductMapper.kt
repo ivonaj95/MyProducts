@@ -36,11 +36,11 @@ class ProductMapper : EntityMapper<Product, ProductDomain> {
         )
     }
 
-    fun fromEntityList(initial: List<Product>): List<ProductDomain> {
-        return initial.map { mapFromEntity(it) }
+    fun fromEntityList(initial: List<Product>?): List<ProductDomain>? {
+        initial?.let {
+            return initial.map { mapFromEntity(it) }
+        }
+        return null
     }
 
-    fun toEntityList(initial: List<ProductDomain>): List<Product> {
-        return initial.map { mapToEntity(it) }
-    }
 }
