@@ -15,8 +15,6 @@ class ProductsAdapter @Inject constructor() :
     RecyclerView.Adapter<ProductItemViewHolder>() {
 
     private lateinit var onClickListener: ProductItemClickListener
-    private val INVALID_POSITION = -1
-    private var lastClickedPos = INVALID_POSITION
 
     var products = listOf<ProductDomain>()
         set(value) {
@@ -29,7 +27,6 @@ class ProductsAdapter @Inject constructor() :
         val viewHolder = ProductItemViewHolder(view)
 
         viewHolder.itemView.setOnClickListener {
-            lastClickedPos = viewHolder.bindingAdapterPosition
             onClickListener.onClick(products[viewHolder.bindingAdapterPosition])
         }
         viewHolder.itemView.setOnFocusChangeListener { _, hasFocus ->
@@ -40,11 +37,6 @@ class ProductsAdapter @Inject constructor() :
     }
 
     override fun onBindViewHolder(holder: ProductItemViewHolder, position: Int) {
-        if (position == lastClickedPos) {
-            holder.itemView.requestFocus()
-            lastClickedPos = INVALID_POSITION
-        }
-
         val item = products[position]
         holder.productTitle.text = item.title
         addImageIntoView(holder.productImage, item.thumbnail!!)

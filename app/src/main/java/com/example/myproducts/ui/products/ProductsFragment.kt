@@ -1,6 +1,7 @@
 package com.example.myproducts.ui.products
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +47,8 @@ class ProductsFragment : MyProductBaseFragment() {
             newFragment.arguments = args
 
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container, newFragment)
+                .hide(this)
+                .add(R.id.container, newFragment)
                 .addToBackStack(null)
                 .commit()
         }
