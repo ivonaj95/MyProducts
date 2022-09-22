@@ -10,7 +10,7 @@ open class MyProductBaseFragment : Fragment() {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) {
-            activeFocus = requireActivity().currentFocus
+            activeFocus = activity?.currentFocus
         } else {
             activeFocus?.requestFocus()
         }

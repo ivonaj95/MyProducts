@@ -9,9 +9,7 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myproducts.BUNDLE_ID
-import com.example.myproducts.MainActivity
-import com.example.myproducts.R
+import com.example.myproducts.*
 import com.example.myproducts.entity.StateData
 import com.example.myproducts.ui.MyProductBaseFragment
 import com.example.myproducts.ui.product_detail.ProductDetailFragment
@@ -54,16 +52,21 @@ class ProductsFragment : MyProductBaseFragment() {
         }
 
         viewModel.products.observe(viewLifecycleOwner, Observer { newProducts ->
+            val bundle = Bundle()
+
             when (newProducts.status) {
                 StateData.Status.LOADING -> {
-                    (activity as MainActivity).showLoading()
+                    bundle.putString(KEY_STATUS, STATUS_LOADING)
+                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
                 }
                 StateData.Status.SUCCESS -> {
-                    (activity as MainActivity).hideLoading()
+                    bundle.putString(KEY_STATUS, STATUS_LOADED)
+                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
                     adapter.products = newProducts.data!!
                 }
                 StateData.Status.ERROR -> {
-                    (activity as MainActivity).hideLoading()
+                    bundle.putString(KEY_STATUS, STATUS_LOADED)
+                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
                     messageView.visibility = View.VISIBLE
                     messageView.text = "${newProducts.error_code} : ${newProducts.message}"
                 }
