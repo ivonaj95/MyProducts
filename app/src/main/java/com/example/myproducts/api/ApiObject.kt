@@ -1,7 +1,5 @@
 package com.example.myproducts.api
 
-import com.example.myproducts.datasource.ProductLocalDataSource
-import com.example.myproducts.datasource.ProductRemoteDataSource
 import com.example.myproducts.repositories.ProductsRepository
 import dagger.Module
 import dagger.Provides
@@ -29,10 +27,6 @@ object ApiObject {
 
     @Singleton
     @Provides
-    fun provideProductRemoteDataSource(apiService: ApiService) = ProductRemoteDataSource(apiService)
-
-    @Singleton
-    @Provides
-    fun provideProductRepository(productRemoteDataSource: ProductRemoteDataSource) = ProductsRepository(productRemoteDataSource, ProductLocalDataSource())
+    fun provideProductRepository(apiService: ApiService) = ProductsRepository(apiService)
 
 }

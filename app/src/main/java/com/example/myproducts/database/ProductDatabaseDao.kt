@@ -6,17 +6,11 @@ import com.example.myproducts.entity.Product
 
 @Dao
 interface ProductDatabaseDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(product: Product)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(products : List<Product>)
-
-    @Update
-    suspend fun update(product: Product)
-
-    @Update
-    suspend fun updateAll(products: List<Product>)
 
     @Query("SELECT * FROM $DATABASE_NAME WHERE id = :key")
     suspend fun get(key: Int): Product?

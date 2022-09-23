@@ -1,6 +1,7 @@
 package com.example.myproducts.ui.product_detail
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,12 +24,23 @@ class ProductDetailViewModel @Inject constructor(
         get() = _product
 
     init {
+        Log.d("IVONA", "LOADING PRODUCT")
         _product.value = StateData(StateData.Status.LOADING, null, null, null)
     }
 
     fun getProduct(id: Int) {
         viewModelScope.launch {
-            _product.value = productsRepository.getProduct(id)
+            val cachedData = productsRepository.getCachedProduct(id)
+            cachedData?.let {
+                Log.d("IVONA", "CACHED PRODUCT")
+                _product.value = StateData(StateData.Status.SUCCESS, it, null, null)
+            }
+
+            val fetchedProduct = productsRepository.fetchAndCacheProduct(id)
+            if((fetchedProduct.status == StateData.Status.SUCCESS) || (_product.value!!.status == StateData.Status.LOADING)) {
+                Log.d("IVONA", "FETCHED PRODUCT")
+                _product.value = productsRepository.fetchAndCacheProduct(id)
+            }
         }
     }
 }

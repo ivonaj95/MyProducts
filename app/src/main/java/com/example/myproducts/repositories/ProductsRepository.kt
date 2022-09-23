@@ -1,47 +1,102 @@
 package com.example.myproducts.repositories
 
-import com.example.myproducts.datasource.ProductLocalDataSource
-import com.example.myproducts.datasource.ProductRemoteDataSource
+import com.example.myproducts.CALL_NOT_EXECUTED
+import com.example.myproducts.MyProductApplication
+import com.example.myproducts.api.ApiService
+import com.example.myproducts.database.ProductDatabase
 import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.domain.ProductMapper
 import com.example.myproducts.entity.Product
+import com.example.myproducts.entity.Products
 import com.example.myproducts.entity.StateData
+import retrofit2.Response
 
 class ProductsRepository(
-    productRemoteDataSource: ProductRemoteDataSource,
-    productLocalDataSource: ProductLocalDataSource
-) : CacheRepository<Product>(
-    remoteDataSource = productRemoteDataSource,
-    localDataSource = productLocalDataSource
+    private val apiService: ApiService
 ) {
     private val productMapper = ProductMapper()
 
-    suspend fun getProducts(): StateData<List<ProductDomain>> {
-        val products = fetchAllAndCache()
-        if (products.isSuccessful) {
-            return StateData(
-                StateData.Status.SUCCESS,
-                productMapper.fromEntityList(products.body),
-                products.code,
-                products.message
-            )
-        }
-        return StateData(StateData.Status.ERROR, null, products.code, products.message)
-    }
+    private val productDatabaseDao =
+        ProductDatabase.getInstance(MyProductApplication.instance).productDatabaseDao
 
-    suspend fun getProduct(id: Int): StateData<ProductDomain> {
-        val product = fetchItemAndCache(id)
-        if (product.isSuccessful) {
-            product.body?.let {
+    private suspend fun getProductsApi() = apiService.getProducts()
+    private suspend fun getProductApi(id: Int) = apiService.getProduct(id)
+
+    suspend fun fetchAndCacheAllProducts(): StateData<List<ProductDomain>> {
+        val productsResponse: Response<Products>?
+        try {
+            productsResponse = getProductsApi()
+        } catch (e: Exception) {
+            // Call is not executed....
+            return StateData(StateData.Status.ERROR, null, CALL_NOT_EXECUTED, e.message)
+        }
+
+        if (productsResponse.isSuccessful) {
+            productsResponse.body()?.let { copyProducts ->
+
+                // Cache products...
+                copyProducts.products?.let {
+                    if (it.isNotEmpty()) {
+                        productDatabaseDao.insertAll(it)
+                    }
+                }
+
                 return StateData(
                     StateData.Status.SUCCESS,
-                    productMapper.mapFromEntity(it),
-                    product.code,
-                    product.message
+                    productMapper.fromEntityList(copyProducts.products),
+                    productsResponse.code(),
+                    productsResponse.message()
                 )
             }
         }
-        return StateData(StateData.Status.ERROR, null, product.code, product.message)
 
+        return StateData(
+            StateData.Status.ERROR,
+            null,
+            productsResponse.code(),
+            productsResponse.message()
+        )
+    }
+
+    suspend fun fetchAndCacheProduct(id: Int): StateData<ProductDomain> {
+
+        val productResponse: Response<Product>?
+        try {
+            productResponse = getProductApi(id)
+        } catch (e: Exception) {
+            // Call is not executed....
+            return StateData(StateData.Status.ERROR, null, CALL_NOT_EXECUTED, e.message)
+        }
+
+        if (productResponse.isSuccessful) {
+
+            productResponse.body()?.let { product ->
+                //CacheProduct
+                productDatabaseDao.insert(product)
+
+                return StateData(
+                    StateData.Status.SUCCESS,
+                    productMapper.mapFromEntity(product),
+                    productResponse.code(),
+                    productResponse.message()
+                )
+
+            }
+        }
+        return StateData(
+            StateData.Status.ERROR,
+            null,
+            productResponse.code(),
+            productResponse.message()
+        )
+    }
+
+    suspend fun getCachedProducts(): List<ProductDomain>? {
+        // sorted descending (just for testing refreshing....)
+        return productMapper.fromEntityList(productDatabaseDao.getAll())?.sortedByDescending { it -> it.id }
+    }
+
+    suspend fun getCachedProduct(id: Int): ProductDomain? {
+        return productDatabaseDao.get(id)?.let { productMapper.mapFromEntity(it) }
     }
 }

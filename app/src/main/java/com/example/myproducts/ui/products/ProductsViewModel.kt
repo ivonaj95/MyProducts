@@ -1,6 +1,7 @@
 package com.example.myproducts.ui.products
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.myproducts.repositories.ProductsRepository
 import com.example.myproducts.domain.ProductDomain
@@ -20,13 +21,25 @@ class ProductsViewModel @Inject constructor(
         get() = _products
 
     init {
+        Log.d("IVONA", "LOADING PRODUCTS")
         _products.value = StateData(StateData.Status.LOADING, null, null, null)
         getProducts()
     }
 
     private fun getProducts() {
         viewModelScope.launch {
-            _products.value = productsRepository.getProducts()
+            val cachedProducts = productsRepository.getCachedProducts()
+            cachedProducts?.let {
+                if (it.isNotEmpty()) {
+                    Log.d("IVONA", "CACHED PRODUCTS")
+                    _products.value = StateData(StateData.Status.SUCCESS, it, null, null)
+                }
+            }
+            val fetchedProducts = productsRepository.fetchAndCacheAllProducts()
+            if ((fetchedProducts.status == StateData.Status.SUCCESS) || (_products.value!!.status == StateData.Status.LOADING)) {
+                Log.d("IVONA", "FETCHED PRODUCTS")
+                _products.value = fetchedProducts
+            }
         }
     }
 
