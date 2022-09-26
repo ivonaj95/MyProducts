@@ -9,6 +9,7 @@ import com.example.myproducts.domain.ProductMapper
 import com.example.myproducts.entity.Product
 import com.example.myproducts.entity.Products
 import com.example.myproducts.entity.StateData
+import com.example.myproducts.entity.StateInfo
 import retrofit2.Response
 
 class ProductsRepository(
@@ -19,16 +20,18 @@ class ProductsRepository(
     private val productDatabaseDao =
         ProductDatabase.getInstance(MyProductApplication.instance).productDatabaseDao
 
+    val products = productDatabaseDao.getAll()
+
     private suspend fun getProductsApi() = apiService.getProducts()
     private suspend fun getProductApi(id: Int) = apiService.getProduct(id)
 
-    suspend fun fetchAndCacheAllProducts(): StateData<List<ProductDomain>> {
+    suspend fun fetchAndCacheAllProducts(): StateInfo {
         val productsResponse: Response<Products>?
         try {
             productsResponse = getProductsApi()
         } catch (e: Exception) {
             // Call is not executed....
-            return StateData(StateData.Status.ERROR, null, CALL_NOT_EXECUTED, e.message)
+            return StateInfo(StateData.Status.ERROR, CALL_NOT_EXECUTED, e.message)
         }
 
         if (productsResponse.isSuccessful) {
@@ -37,28 +40,28 @@ class ProductsRepository(
                 // Cache products...
                 copyProducts.products?.let {
                     if (it.isNotEmpty()) {
-                        productDatabaseDao.insertAll(it)
+                        productDatabaseDao.insertAll(
+                            productMapper.fromEntityList(it),
+                        )
                     }
                 }
 
-                return StateData(
+                return StateInfo(
                     StateData.Status.SUCCESS,
-                    productMapper.fromEntityList(copyProducts.products),
                     productsResponse.code(),
                     productsResponse.message()
                 )
             }
         }
 
-        return StateData(
+        return StateInfo(
             StateData.Status.ERROR,
-            null,
             productsResponse.code(),
             productsResponse.message()
         )
     }
 
-    suspend fun fetchAndCacheProduct(id: Int): StateData<ProductDomain> {
+    suspend fun fetchProduct(id: Int): StateData<ProductDomain> {
 
         val productResponse: Response<Product>?
         try {
@@ -71,9 +74,6 @@ class ProductsRepository(
         if (productResponse.isSuccessful) {
 
             productResponse.body()?.let { product ->
-                //CacheProduct
-                productDatabaseDao.insert(product)
-
                 return StateData(
                     StateData.Status.SUCCESS,
                     productMapper.mapFromEntity(product),
@@ -91,12 +91,7 @@ class ProductsRepository(
         )
     }
 
-    suspend fun getCachedProducts(): List<ProductDomain>? {
-        // sorted descending (just for testing refreshing....)
-        return productMapper.fromEntityList(productDatabaseDao.getAll())?.sortedByDescending { it -> it.id }
-    }
-
     suspend fun getCachedProduct(id: Int): ProductDomain? {
-        return productDatabaseDao.get(id)?.let { productMapper.mapFromEntity(it) }
+        return productDatabaseDao.get(id)
     }
 }

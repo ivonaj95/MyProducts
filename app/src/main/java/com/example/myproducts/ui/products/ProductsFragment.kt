@@ -52,9 +52,30 @@ class ProductsFragment : MyProductBaseFragment() {
         }
 
         viewModel.products.observe(viewLifecycleOwner, Observer { newProducts ->
+            if (newProducts.isNotEmpty()) {
+
+                // hide loading...
+                val bundle = Bundle()
+                bundle.putString(KEY_STATUS, STATUS_LOADED)
+                parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+
+                // refresh items
+                newProducts?.let {
+                    if(adapter.products.isNotEmpty()) {
+                        // just for testing ....
+                        Log.d("IVONA","refresh ... ")
+                        adapter.products = it.sortedByDescending { product -> product.id }
+                    } else {
+                        adapter.products = it
+                    }
+                }
+            }
+        })
+
+        viewModel.stateValue.observe(viewLifecycleOwner, Observer { newState ->
             val bundle = Bundle()
 
-            when (newProducts.status) {
+            when (newState.status) {
                 StateData.Status.LOADING -> {
                     bundle.putString(KEY_STATUS, STATUS_LOADING)
                     parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
@@ -62,16 +83,18 @@ class ProductsFragment : MyProductBaseFragment() {
                 StateData.Status.SUCCESS -> {
                     bundle.putString(KEY_STATUS, STATUS_LOADED)
                     parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                    adapter.products = newProducts.data!!
                 }
                 StateData.Status.ERROR -> {
                     bundle.putString(KEY_STATUS, STATUS_LOADED)
                     parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                    messageView.visibility = View.VISIBLE
-                    messageView.text = "${newProducts.error_code} : ${newProducts.message}"
+
+                    // do not show error if we already have some items loaded
+                    if (adapter.products.isEmpty()) {
+                        messageView.visibility = View.VISIBLE
+                        messageView.text = "${newState.error_code} : ${newState.message}"
+                    }
                 }
             }
-
         })
 
         recyclerView.adapter = adapter

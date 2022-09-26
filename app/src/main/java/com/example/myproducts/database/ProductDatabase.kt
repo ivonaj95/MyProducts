@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.myproducts.DATABASE_NAME
+import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.Product
 
-const val DATABASE_VERSION = 1
+const val DATABASE_VERSION = 2
 
-@Database(entities = [Product::class], version = DATABASE_VERSION)
+@Database(entities = [ProductDomain::class], version = DATABASE_VERSION)
 @TypeConverters(ListConverters::class)
 abstract class ProductDatabase : RoomDatabase() {
     abstract val productDatabaseDao : ProductDatabaseDao
