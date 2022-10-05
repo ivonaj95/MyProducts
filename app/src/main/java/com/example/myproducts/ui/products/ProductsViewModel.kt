@@ -8,6 +8,9 @@ import com.example.myproducts.entity.StateData
 import com.example.myproducts.entity.StateInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,15 +19,14 @@ class ProductsViewModel @Inject constructor(
     private val productsRepository: ProductsRepository
 ) : ViewModel() {
 
-    val products: LiveData<List<ProductDomain>> = productsRepository.products
+    val products: Flow<List<ProductDomain>> = productsRepository.products
 
-    private val _stateValue = MutableLiveData<StateInfo>()
-    val stateValue: LiveData<StateInfo>
+    private val _stateValue = MutableStateFlow(StateInfo(StateData.Status.LOADING, null, null))
+    val stateValue: StateFlow<StateInfo>
         get() = _stateValue
 
     init {
         Log.d("IVONA", "LOADING PRODUCTS")
-        _stateValue.value = StateInfo(StateData.Status.LOADING, null, null)
         getProducts()
     }
 

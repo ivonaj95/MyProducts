@@ -9,7 +9,7 @@ import com.example.myproducts.DATABASE_NAME
 import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.Product
 
-const val DATABASE_VERSION = 2
+const val DATABASE_VERSION = 3
 
 @Database(entities = [ProductDomain::class], version = DATABASE_VERSION)
 @TypeConverters(ListConverters::class)

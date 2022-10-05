@@ -1,10 +1,9 @@
 package com.example.myproducts.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.myproducts.DATABASE_NAME
 import com.example.myproducts.domain.ProductDomain
-import com.example.myproducts.entity.Product
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDatabaseDao {
@@ -18,7 +17,7 @@ interface ProductDatabaseDao {
     suspend fun get(key: Int): ProductDomain?
 
     @Query("SELECT * FROM $DATABASE_NAME")
-    fun getAll() : LiveData<List<ProductDomain>>
+    fun getAll() : Flow<List<ProductDomain>>
 
     @Delete
     suspend fun delete(product: ProductDomain)

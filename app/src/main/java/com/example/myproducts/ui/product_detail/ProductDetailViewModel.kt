@@ -6,6 +6,8 @@ import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.StateData
 import com.example.myproducts.repositories.ProductsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,14 +16,16 @@ class ProductDetailViewModel @Inject constructor(
     private val productsRepository: ProductsRepository
 ) : ViewModel() {
 
-    private val _product = MutableLiveData<StateData<ProductDomain>>()
-    val product: LiveData<StateData<ProductDomain>>
+    private val _product = MutableStateFlow<StateData<ProductDomain>>(
+        StateData(
+            StateData.Status.LOADING,
+            null,
+            null,
+            null
+        )
+    )
+    val product: StateFlow<StateData<ProductDomain>>
         get() = _product
-
-    init {
-        Log.d("IVONA", "LOADING PRODUCT")
-        _product.value = StateData(StateData.Status.LOADING, null, null, null)
-    }
 
     fun getProduct(id: Int) {
         viewModelScope.launch {
@@ -32,7 +36,7 @@ class ProductDetailViewModel @Inject constructor(
             }
 
             val fetchedProduct = productsRepository.fetchProduct(id)
-            if((fetchedProduct.status == StateData.Status.SUCCESS) || (_product.value!!.status == StateData.Status.LOADING)) {
+            if ((fetchedProduct.status == StateData.Status.SUCCESS) || (_product.value.status == StateData.Status.LOADING)) {
                 Log.d("IVONA", "FETCHED PRODUCT")
                 _product.value = productsRepository.fetchProduct(id)
             }

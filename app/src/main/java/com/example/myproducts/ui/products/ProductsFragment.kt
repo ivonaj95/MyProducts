@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myproducts.*
 import com.example.myproducts.entity.StateData
 import com.example.myproducts.ui.MyProductBaseFragment
 import com.example.myproducts.ui.product_detail.ProductDetailFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class ProductsFragment : MyProductBaseFragment() {
@@ -51,51 +53,51 @@ class ProductsFragment : MyProductBaseFragment() {
                 .commit()
         }
 
-        viewModel.products.observe(viewLifecycleOwner, Observer { newProducts ->
-            if (newProducts.isNotEmpty()) {
+        lifecycleScope.launchWhenStarted {
+            viewModel.products.collectLatest { newProducts ->
+                if (newProducts.isNotEmpty()) {
 
-                // hide loading...
-                val bundle = Bundle()
-                bundle.putString(KEY_STATUS, STATUS_LOADED)
-                parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                    // hide loading...
+                    val bundle = Bundle()
+                    bundle.putString(KEY_STATUS, STATUS_LOADED)
+                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
 
-                // refresh items
-                newProducts?.let {
-                    if(adapter.products.isNotEmpty()) {
+                    // refresh items
+                    if (adapter.products.isNotEmpty()) {
                         // just for testing ....
-                        Log.d("IVONA","refresh ... ")
-                        adapter.products = it.sortedByDescending { product -> product.id }
+                        Log.d("IVONA", "refresh ... ")
+                        adapter.products = newProducts.sortedByDescending { product -> product.id }
                     } else {
-                        adapter.products = it
+                        adapter.products = newProducts
                     }
                 }
             }
-        })
 
-        viewModel.stateValue.observe(viewLifecycleOwner, Observer { newState ->
-            val bundle = Bundle()
+            viewModel.stateValue.collectLatest { newState ->
+                val bundle = Bundle()
 
-            when (newState.status) {
-                StateData.Status.LOADING -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADING)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                }
-                StateData.Status.SUCCESS -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADED)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                }
-                StateData.Status.ERROR -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADED)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                when (newState.status) {
+                    StateData.Status.LOADING -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADING)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                    }
+                    StateData.Status.SUCCESS -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADED)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                    }
+                    StateData.Status.ERROR -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADED)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
 
-                    // do not show error if we already have some items loaded
-                    if (adapter.products.isEmpty()) {
-                        messageView.visibility = View.VISIBLE
-                        messageView.text = "${newState.error_code} : ${newState.message}"
+                        // do not show error if we already have some items loaded
+                        if (adapter.products.isEmpty()) {
+                            messageView.visibility = View.VISIBLE
+                            messageView.text = "${newState.error_code} : ${newState.message}"
+                        }
                     }
                 }
             }
-        })
+        }
 
         recyclerView.adapter = adapter
         return view

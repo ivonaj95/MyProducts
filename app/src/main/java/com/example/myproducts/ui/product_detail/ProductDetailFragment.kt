@@ -8,11 +8,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.myproducts.*
 import com.example.myproducts.domain.ProductDomain
 import com.example.myproducts.entity.StateData
 import com.example.myproducts.ui.MyProductBaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class ProductDetailFragment : MyProductBaseFragment() {
@@ -41,26 +43,29 @@ class ProductDetailFragment : MyProductBaseFragment() {
         viewModel = ViewModelProvider(this)[ProductDetailViewModel::class.java]
         viewModel.getProduct(requireArguments().getInt(BUNDLE_ID))
 
-        viewModel.product.observe(viewLifecycleOwner, Observer { newProduct ->
-            val bundle = Bundle()
-            when (newProduct.status) {
-                StateData.Status.LOADING -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADING)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                }
-                StateData.Status.SUCCESS -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADED)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                    newProduct.data?.let { refreshUI(it) }
-                }
-                StateData.Status.ERROR -> {
-                    bundle.putString(KEY_STATUS, STATUS_LOADED)
-                    parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
-                    nameView.text = newProduct.error_code.toString()
-                    descriptionView.text = newProduct.message
+        lifecycleScope.launchWhenStarted {
+
+            viewModel.product.collectLatest { newProduct ->
+                val bundle = Bundle()
+                when (newProduct.status) {
+                    StateData.Status.LOADING -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADING)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                    }
+                    StateData.Status.SUCCESS -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADED)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                        newProduct.data?.let { refreshUI(it) }
+                    }
+                    StateData.Status.ERROR -> {
+                        bundle.putString(KEY_STATUS, STATUS_LOADED)
+                        parentFragmentManager.setFragmentResult(REQUEST_LOADING_STATUS, bundle)
+                        nameView.text = newProduct.error_code.toString()
+                        descriptionView.text = newProduct.message
+                    }
                 }
             }
-        })
+        }
 
         return view
     }
